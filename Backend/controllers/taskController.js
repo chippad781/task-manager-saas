@@ -38,3 +38,18 @@ exports.deleteTask = async (req, res) => {
     res.status(500).json({ error: err.message })
   }
 }
+
+exports.toggleTask = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const task = await pool.query(
+      "UPDATE tasks SET completed = NOT completed WHERE id=$1 RETURNING *",
+      [id]
+    );
+
+    res.json(task.rows[0]);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
