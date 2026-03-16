@@ -55,13 +55,22 @@ function App() {
   };
 
   const toggleTask = async (id) => {
-    await fetch(`${API}/${id}/toggle`, {
+  try {
+    const res = await fetch(`${API}/${id}/toggle`, {
       method: "PUT",
     });
 
-    loadTasks();
-    loadStats();
-  };
+    if (!res.ok) {
+      console.error("Toggle failed");
+      return;
+    }
+
+    await loadTasks();
+    await loadStats();
+  } catch (err) {
+    console.error(err);
+  }
+};
 
   return (
     <div style={styles.page}>
