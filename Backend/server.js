@@ -8,11 +8,8 @@ const app = express()
 
 app.use(
   cors({
-    origin: [
-      "https://task-manager-saas-tau.vercel.app",
-      "http://localhost:3000"
-    ],
-    methods: ["GET", "POST", "PUT", "DELETE"],
+    origin: "*",
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type"],
   })
 );
