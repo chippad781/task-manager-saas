@@ -55,24 +55,30 @@ function App() {
   };
 
   const toggleTask = async (id) => {
-  const res = await fetch(`${API}/${id}/toggle`, {
-    method: "PUT",
-  });
+  try {
+    const res = await fetch(`${API}/${id}/toggle`, {
+      method: "PUT",
+    });
 
-  const updatedTask = await res.json();
+    const updatedTask = await res.json();
 
-  const updatedTasks = tasks.map((t) =>
-    t.id === updatedTask.id ? updatedTask : t
-  );
+    const updatedTasks = tasks.map((t) =>
+      t.id === updatedTask.id ? updatedTask : t
+    );
 
-  setTasks(updatedTasks);
+    setTasks(updatedTasks);
 
-  const completed = updatedTasks.filter(t => t.completed).length;
+    // recalculate stats directly from updated tasks
+    const completed = updatedTasks.filter((t) => t.completed).length;
 
-  setStats({
-    total: updatedTasks.length,
-    completed: completed
-  });
+    setStats({
+      total: updatedTasks.length,
+      completed: completed,
+    });
+
+  } catch (err) {
+    console.error(err);
+  }
 };
 
   return (
