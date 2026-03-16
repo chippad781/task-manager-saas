@@ -2,16 +2,18 @@ const pool = require("../db/db")
 
 exports.getTasks = async (req, res) => {
   try {
-    const tasks = await pool.query(
-      "SELECT * FROM tasks ORDER BY created_at DESC"
-    )
 
-    res.json(tasks.rows)
+    const tasks = await pool.query(
+      "SELECT * FROM tasks ORDER BY id DESC"
+    );
+
+    res.json(tasks.rows);
+
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: err.message });
   }
-}
+};
 
 exports.createTask = async (req, res) => {
   try {
