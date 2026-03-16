@@ -61,11 +61,18 @@ function App() {
 
   const updatedTask = await res.json();
 
-  setTasks(tasks.map(t =>
+  const updatedTasks = tasks.map((t) =>
     t.id === updatedTask.id ? updatedTask : t
-  ));
+  );
 
-  loadStats();
+  setTasks(updatedTasks);
+
+  const completed = updatedTasks.filter(t => t.completed).length;
+
+  setStats({
+    total: updatedTasks.length,
+    completed: completed
+  });
 };
 
   return (
