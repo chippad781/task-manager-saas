@@ -30,6 +30,8 @@ function App() {
   }, []);
 
   const addTask = async () => {
+    if (!title.trim()) return;
+
     await fetch(API, {
       method: "POST",
       headers: {
@@ -62,59 +64,180 @@ function App() {
   };
 
   return (
-    <div style={{ padding: "40px", fontFamily: "Arial" }}>
-      <h1>Task Manager</h1>
+    <div style={styles.page}>
 
-      <input
-        placeholder="Enter task"
-        value={title}
-        onChange={(e) => setTitle(e.target.value)}
-      />
+      <div style={styles.container}>
 
-      <button onClick={addTask}>Add Task</button>
+        <h1 style={styles.title}>Task Manager Dashboard</h1>
 
-      <ul>
-        {tasks.map((task) => (
-          <li key={task.id}>
-            {task.title}
+        <div style={styles.inputSection}>
+          <input
+            style={styles.input}
+            placeholder="Enter new task..."
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+          />
 
-            <button
-              onClick={() => deleteTask(task.id)}
-              style={{ marginLeft: "10px" }}
-            >
-              Delete
-            </button>
+          <button style={styles.addButton} onClick={addTask}>
+            Add
+          </button>
+        </div>
 
-            <button
-              onClick={() => toggleTask(task.id)}
-              style={{ marginLeft: "10px" }}
-            >
-              Toggle
-            </button>
-          </li>
-        ))}
-      </ul>
+        <div style={styles.card}>
 
-      <h2>Task Analytics</h2>
+          <h2>Tasks</h2>
 
-      <div style={{ width: "300px" }}>
-        <Pie
-          data={{
-            labels: ["Completed", "Pending"],
-            datasets: [
-              {
-                data: [
-                  stats.completed,
-                  stats.total - stats.completed
-                ],
-                backgroundColor: ["#4CAF50", "#FF9800"],
-              },
-            ],
-          }}
-        />
+          {tasks.length === 0 && (
+            <p style={{color:"#888"}}>No tasks yet</p>
+          )}
+
+          {tasks.map((task) => (
+            <div key={task.id} style={styles.taskRow}>
+
+              <span
+                style={{
+                  ...styles.taskText,
+                  textDecoration: task.completed ? "line-through" : "none",
+                  color: task.completed ? "#777" : "#000"
+                }}
+              >
+                {task.title}
+              </span>
+
+              <div>
+
+                <button
+                  style={styles.toggleBtn}
+                  onClick={() => toggleTask(task.id)}
+                >
+                  ✓
+                </button>
+
+                <button
+                  style={styles.deleteBtn}
+                  onClick={() => deleteTask(task.id)}
+                >
+                  ✕
+                </button>
+
+              </div>
+
+            </div>
+          ))}
+
+        </div>
+
+        <div style={styles.card}>
+
+          <h2>Analytics</h2>
+
+          <div style={{ width: "250px", margin: "auto" }}>
+            <Pie
+              data={{
+                labels: ["Completed", "Pending"],
+                datasets: [
+                  {
+                    data: [
+                      stats.completed,
+                      stats.total - stats.completed
+                    ],
+                    backgroundColor: ["#22c55e", "#f97316"]
+                  }
+                ]
+              }}
+            />
+          </div>
+
+        </div>
+
       </div>
+
     </div>
   );
 }
+
+const styles = {
+
+  page:{
+    minHeight:"100vh",
+    background:"#f5f7fb",
+    display:"flex",
+    justifyContent:"center",
+    alignItems:"flex-start",
+    paddingTop:"50px",
+    fontFamily:"Segoe UI"
+  },
+
+  container:{
+    width:"500px"
+  },
+
+  title:{
+    textAlign:"center",
+    marginBottom:"30px"
+  },
+
+  inputSection:{
+    display:"flex",
+    gap:"10px",
+    marginBottom:"20px"
+  },
+
+  input:{
+    flex:1,
+    padding:"12px",
+    borderRadius:"8px",
+    border:"1px solid #ccc"
+  },
+
+  addButton:{
+    padding:"12px 18px",
+    background:"#2563eb",
+    color:"white",
+    border:"none",
+    borderRadius:"8px",
+    cursor:"pointer"
+  },
+
+  card:{
+    background:"white",
+    padding:"20px",
+    borderRadius:"10px",
+    boxShadow:"0 5px 15px rgba(0,0,0,0.08)",
+    marginBottom:"20px"
+  },
+
+  taskRow:{
+    display:"flex",
+    justifyContent:"space-between",
+    alignItems:"center",
+    padding:"10px 0",
+    borderBottom:"1px solid #eee"
+  },
+
+  taskText:{
+    fontSize:"16px"
+  },
+
+  toggleBtn:{
+    marginRight:"8px",
+    background:"#22c55e",
+    border:"none",
+    color:"white",
+    padding:"6px 10px",
+    borderRadius:"6px",
+    cursor:"pointer"
+  },
+
+  deleteBtn:{
+    background:"#ef4444",
+    border:"none",
+    color:"white",
+    padding:"6px 10px",
+    borderRadius:"6px",
+    cursor:"pointer"
+  }
+
+};
 
 export default App;
