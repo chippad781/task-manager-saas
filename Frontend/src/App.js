@@ -6,7 +6,7 @@ Chart.register(ArcElement, Tooltip, Legend);
 
 function App() {
 
-  const API = "http://localhost:5000/api/tasks";
+  const API = "/api/tasks";
 
   const [tasks, setTasks] = useState([]);
   const [title, setTitle] = useState("");
@@ -19,7 +19,7 @@ function App() {
   };
 
   const loadStats = async () => {
-    const res = await fetch("http://localhost:5000/api/stats");
+    const res = await fetch("/api/stats");
     const data = await res.json();
     setStats(data);
   };
