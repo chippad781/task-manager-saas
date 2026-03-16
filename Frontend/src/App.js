@@ -58,16 +58,18 @@ function App() {
   try {
     await fetch(`${API}/${id}/toggle`, {
       method: "PUT",
+      headers: {
+        "Content-Type": "application/json"
+      }
     });
 
-    // reload data from backend
     await loadTasks();
     await loadStats();
 
   } catch (err) {
     console.error(err);
   }
-};;
+};
 
   return (
     <div style={styles.page}>
