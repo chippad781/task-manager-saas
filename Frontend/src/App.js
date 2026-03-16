@@ -56,30 +56,18 @@ function App() {
 
   const toggleTask = async (id) => {
   try {
-    const res = await fetch(`${API}/${id}/toggle`, {
+    await fetch(`${API}/${id}/toggle`, {
       method: "PUT",
     });
 
-    const updatedTask = await res.json();
-
-    const updatedTasks = tasks.map((t) =>
-      t.id === updatedTask.id ? updatedTask : t
-    );
-
-    setTasks(updatedTasks);
-
-    // recalculate stats directly from updated tasks
-    const completed = updatedTasks.filter((t) => t.completed).length;
-
-    setStats({
-      total: updatedTasks.length,
-      completed: completed,
-    });
+    // reload data from backend
+    await loadTasks();
+    await loadStats();
 
   } catch (err) {
     console.error(err);
   }
-};
+};;
 
   return (
     <div style={styles.page}>
