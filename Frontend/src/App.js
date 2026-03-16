@@ -55,21 +55,17 @@ function App() {
   };
 
   const toggleTask = async (id) => {
-  try {
-    const res = await fetch(`${API}/${id}/toggle`, {
-      method: "PUT",
-    });
+  const res = await fetch(`${API}/${id}/toggle`, {
+    method: "PUT",
+  });
 
-    if (!res.ok) {
-      console.error("Toggle failed");
-      return;
-    }
+  const updatedTask = await res.json();
 
-    await loadTasks();
-    await loadStats();
-  } catch (err) {
-    console.error(err);
-  }
+  setTasks(tasks.map(t =>
+    t.id === updatedTask.id ? updatedTask : t
+  ));
+
+  loadStats();
 };
 
   return (
