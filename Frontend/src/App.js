@@ -10,26 +10,46 @@ function App() {
 
   const [tasks, setTasks] = useState([]);
   const [title, setTitle] = useState("");
+  const [stats, setStats] = useState({ total: 0, completed: 0 });
 
   const loadTasks = async () => {
-  try {
-    const res = await fetch(API);
-    const data = await res.json();
+    try {
+      const res = await fetch(API);
+      const data = await res.json();
 
-    if (Array.isArray(data)) {
-      setTasks(data);
-    } else {
-      console.error("API did not return array:", data);
+      if (Array.isArray(data)) {
+        setTasks(data);
+      } else {
+        console.error("API did not return array:", data);
+        setTasks([]);
+      }
+    } catch (err) {
+      console.error(err);
       setTasks([]);
     }
-  } catch (err) {
-    console.error(err);
-    setTasks([]);
-  }
-};
+  };
+
+  const loadStats = async () => {
+    try {
+      const res = await fetch(
+        "https://task-manager-saas-production.up.railway.app/api/stats"
+      );
+      const data = await res.json();
+
+      setStats({
+        total: Number(data.total) || 0,
+        completed: Number(data.completed) || 0
+      });
+
+    } catch (err) {
+      console.error(err);
+      setStats({ total: 0, completed: 0 });
+    }
+  };
 
   useEffect(() => {
     loadTasks();
+    loadStats();
   }, []);
 
   const addTask = async () => {
@@ -38,40 +58,40 @@ function App() {
     await fetch(API, {
       method: "POST",
       headers: {
-        "Content-Type": "application/json",
+        "Content-Type": "application/json"
       },
-      body: JSON.stringify({ title }),
+      body: JSON.stringify({ title })
     });
 
     setTitle("");
     loadTasks();
+    loadStats();
   };
 
   const deleteTask = async (id) => {
     await fetch(`${API}/${id}`, {
-      method: "DELETE",
+      method: "DELETE"
     });
 
     loadTasks();
+    loadStats();
   };
 
   const toggleTask = async (id) => {
     await fetch(`${API}/${id}/toggle`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      method: "PUT"
     });
 
     loadTasks();
+    loadStats();
   };
 
-  const completed = tasks?.filter?.(t => t.completed) || [];
-  const total = tasks.length;
+  const completed = Number(stats.completed) || 0;
+  const total = Number(stats.total) || 0;
+  const pending = Math.max(total - completed, 0);
 
   return (
     <div style={styles.page}>
-
       <div style={styles.container}>
 
         <h1 style={styles.title}>Task Manager Dashboard</h1>
@@ -94,7 +114,7 @@ function App() {
           <h2>Tasks</h2>
 
           {tasks.length === 0 && (
-            <p style={{color:"#888"}}>No tasks yet</p>
+            <p style={{ color: "#888" }}>No tasks yet</p>
           )}
 
           {tasks.map((task) => (
@@ -137,111 +157,109 @@ function App() {
 
           <h2>Analytics</h2>
 
-          <div style={{ width: "250px", margin: "auto" }}>
-            <Pie
-              data={{
-                labels: ["Completed", "Pending"],
-                datasets: [
-                  {
-                    data: [
-                      completed,
-                      total - completed
-                    ],
-                    backgroundColor: ["#22c55e", "#f97316"]
-                  }
-                ]
-              }}
-            />
-          </div>
+          {total > 0 && (
+            <div style={{ width: "250px", margin: "auto" }}>
+              <Pie
+                data={{
+                  labels: ["Completed", "Pending"],
+                  datasets: [
+                    {
+                      data: [completed, pending],
+                      backgroundColor: ["#22c55e", "#f97316"]
+                    }
+                  ]
+                }}
+              />
+            </div>
+          )}
 
         </div>
 
       </div>
-
     </div>
   );
 }
 
 const styles = {
 
-  page:{
-    minHeight:"100vh",
-    background:"#f5f7fb",
-    display:"flex",
-    justifyContent:"center",
-    alignItems:"flex-start",
-    paddingTop:"50px",
-    fontFamily:"Segoe UI"
+  page: {
+    minHeight: "100vh",
+    background: "#f5f7fb",
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "flex-start",
+    paddingTop: "50px",
+    fontFamily: "Segoe UI"
   },
 
-  container:{
-    width:"500px"
+  container: {
+    width: "500px"
   },
 
-  title:{
-    textAlign:"center",
-    marginBottom:"30px"
+  title: {
+    textAlign: "center",
+    marginBottom: "30px"
   },
 
-  inputSection:{
-    display:"flex",
-    gap:"10px",
-    marginBottom:"20px"
+  inputSection: {
+    display: "flex",
+    gap: "10px",
+    marginBottom: "20px"
   },
 
-  input:{
-    flex:1,
-    padding:"12px",
-    borderRadius:"8px",
-    border:"1px solid #ccc"
+  input: {
+    flex: 1,
+    padding: "12px",
+    borderRadius: "8px",
+    border: "1px solid #ccc"
   },
 
-  addButton:{
-    padding:"12px 18px",
-    background:"#2563eb",
-    color:"white",
-    border:"none",
-    borderRadius:"8px",
-    cursor:"pointer"
+  addButton: {
+    padding: "12px 18px",
+    background: "#2563eb",
+    color: "white",
+    border: "none",
+    borderRadius: "8px",
+    cursor: "pointer"
   },
 
-  card:{
-    background:"white",
-    padding:"20px",
-    borderRadius:"10px",
-    boxShadow:"0 5px 15px rgba(0,0,0,0.08)",
-    marginBottom:"20px"
+  card: {
+    background: "white",
+    padding: "20px",
+    borderRadius: "10px",
+    boxShadow: "0 5px 15px rgba(0,0,0,0.08)",
+    marginBottom: "20px"
   },
 
-  taskRow:{
-    display:"flex",
-    justifyContent:"space-between",
-    alignItems:"center",
-    padding:"10px 0",
-    borderBottom:"1px solid #eee"
+  taskRow: {
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+    padding: "10px 0",
+    borderBottom: "1px solid #eee"
   },
 
-  taskText:{
-    fontSize:"16px"
+  taskText: {
+    fontSize: "16px"
   },
 
-  toggleBtn:{
-    marginRight:"8px",
-    background:"#22c55e",
-    border:"none",
-    color:"white",
-    padding:"6px 10px",
-    borderRadius:"6px",
-    cursor:"pointer"
+  toggleBtn: {
+    marginRight: "8px",
+    background: "#22c55e",
+    border: "none",
+    color: "white",
+    padding: "6px 10px",
+    borderRadius: "6px",
+    cursor: "pointer"
   },
 
-  deleteBtn:{
-    background:"#ef4444",
-    border:"none",
-    color:"white",
-    padding:"6px 10px",
-    borderRadius:"6px",
-    cursor:"pointer"
+  deleteBtn: {
+    background: "#ef4444",
+    border: "none",
+    color: "white",
+    padding: "6px 10px",
+    borderRadius: "6px",
+    cursor: "pointer"
   }
 
 };
