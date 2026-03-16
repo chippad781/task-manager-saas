@@ -12,10 +12,21 @@ function App() {
   const [title, setTitle] = useState("");
 
   const loadTasks = async () => {
+  try {
     const res = await fetch(API);
     const data = await res.json();
-    setTasks(data);
-  };
+
+    if (Array.isArray(data)) {
+      setTasks(data);
+    } else {
+      console.error("API did not return array:", data);
+      setTasks([]);
+    }
+  } catch (err) {
+    console.error(err);
+    setTasks([]);
+  }
+};
 
   useEffect(() => {
     loadTasks();
@@ -55,7 +66,7 @@ function App() {
     loadTasks();
   };
 
-  const completed = tasks.filter(t => t.completed).length;
+  const completed = tasks?.filter?.(t => t.completed) || [];
   const total = tasks.length;
 
   return (
