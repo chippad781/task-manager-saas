@@ -10,7 +10,6 @@ function App() {
 
   const [tasks, setTasks] = useState([]);
   const [title, setTitle] = useState("");
-  const [stats, setStats] = useState({ total: 0, completed: 0 });
 
   const loadTasks = async () => {
     const res = await fetch(API);
@@ -18,15 +17,8 @@ function App() {
     setTasks(data);
   };
 
-  const loadStats = async () => {
-    const res = await fetch("https://task-manager-saas-production.up.railway.app/api/stats");
-    const data = await res.json();
-    setStats(data);
-  };
-
   useEffect(() => {
     loadTasks();
-    loadStats();
   }, []);
 
   const addTask = async () => {
@@ -42,7 +34,6 @@ function App() {
 
     setTitle("");
     loadTasks();
-    loadStats();
   };
 
   const deleteTask = async (id) => {
@@ -51,25 +42,21 @@ function App() {
     });
 
     loadTasks();
-    loadStats();
   };
 
   const toggleTask = async (id) => {
-  try {
     await fetch(`${API}/${id}/toggle`, {
       method: "PUT",
       headers: {
-        "Content-Type": "application/json"
-      }
+        "Content-Type": "application/json",
+      },
     });
 
-    await loadTasks();
-    await loadStats();
+    loadTasks();
+  };
 
-  } catch (err) {
-    console.error(err);
-  }
-};
+  const completed = tasks.filter(t => t.completed).length;
+  const total = tasks.length;
 
   return (
     <div style={styles.page}>
@@ -146,8 +133,8 @@ function App() {
                 datasets: [
                   {
                     data: [
-                      stats.completed,
-                      stats.total - stats.completed
+                      completed,
+                      total - completed
                     ],
                     backgroundColor: ["#22c55e", "#f97316"]
                   }
